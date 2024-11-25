@@ -1,0 +1,3 @@
+/system/bin/am                  u:object_r:gear_exec:s0
+
+/system/bin/gearService         u:object_r:gearService_exec:s0
