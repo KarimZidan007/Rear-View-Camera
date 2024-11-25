@@ -1,0 +1,13 @@
+type gearService, domain;
+type am, domain;
+
+type gearService_exec, exec_type, file_type;
+type gear_exec, exec_type, file_type;
+
+type_transition init gear_exec:process am;
+type_transition init gearService_exec:process gearService;
+
+allow init gear_exec:file { read execute };
+allow init gearService_exec:file { read execute };
+
+
