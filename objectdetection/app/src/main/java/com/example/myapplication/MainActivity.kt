@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.content.pm.PackageManager
 import android.graphics.SurfaceTexture
 import android.os.Bundle
-
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
@@ -20,9 +19,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var model: LiteModelSsdMobilenetV11Metadata2
     private lateinit var imageProcessor: ImageProcessor
     private lateinit var textureView: TextureView
+    private var steering = Steering(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +47,10 @@ class MainActivity : AppCompatActivity() {
 
         checkCameraPermission()
         setupTextureView()
+
+        // this line is to check permission for VHAL add by hamed
+        requestPermissions(Steering.permission , Steering.steeringPermissionCode)
+
     }
 
     private fun checkCameraPermission() {
@@ -169,10 +175,23 @@ if (guideLinesView.visibility == View.GONE)
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            setupTextureView()
-        } else {
-            Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
+
+        when(requestCode){
+            CAMERA_PERMISSION_CODE ->{
+                if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setupTextureView()
+                } else {
+                    Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
+                }
+            }
+            Steering.steeringPermissionCode->{
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                    steering.readStearing()
+
+                }
+            }
         }
+
     }
 }
