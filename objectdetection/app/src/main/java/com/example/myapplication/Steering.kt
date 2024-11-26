@@ -13,6 +13,7 @@ import kotlin.concurrent.thread
 class Steering(var context : Context) {
      var car :Car
      var  carPropertyManager  : CarPropertyManager
+    private lateinit var guideLinesView: GuideLinesView
     init {
          car = Car.createCar(context)
         carPropertyManager = car.getCarManager(Car.PROPERTY_SERVICE) as CarPropertyManager
@@ -37,9 +38,7 @@ class Steering(var context : Context) {
                        val rpm = steeringAngle.value as Int
                        Toast.makeText(context, "Stearing Angle is ${rpm}", Toast.LENGTH_SHORT).show()
                        Log.e("steering" , "steering rotate")
-//                       runOnUiThread {
-//                           /* this method will be updated by abooda */
-//                       }
+                       guideLinesView.steeringAngle(rpm)
                    }
                    Thread.sleep(300)
                } catch (e: Exception) {

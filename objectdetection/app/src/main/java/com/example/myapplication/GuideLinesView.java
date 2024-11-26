@@ -17,7 +17,8 @@ import java.util.List;
 
 public class GuideLinesView extends View {
 
-    private Paint redPaint, yellowPaint, greenPaint;
+    private Paint redPaint, yellowPaint, greenPaint,bluePaint;
+    private float curvedOffset;
     private List<LiteModelSsdMobilenetV11Metadata2.DetectionResult> detections = new ArrayList<>();
     public GuideLinesView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -29,6 +30,7 @@ public class GuideLinesView extends View {
         redPaint = createPaint(0xFFFF0000); // Red
         yellowPaint = createPaint(0xFFFFFF00); // Yellow
         greenPaint = createPaint(0xFF00FF00); // Green
+        bluePaint = createPaint(0xFF0000FF);
     }
 
     /**
@@ -80,6 +82,22 @@ public class GuideLinesView extends View {
 
         // Draw green lines (far zone)
         drawGuideline(canvas, centerX, endY + 150, endY + 300, endOffset + 80, endOffset + 160, redPaint);
+        drawCurvedLine(
+                canvas,
+                centerX + endOffset + 160, endY + 200,
+                centerX + endOffset - 50, startY,
+                centerX + startOffset + curvedOffset , startY - 100,
+                bluePaint
+        );
+
+        // Right line: curve to the right
+        drawCurvedLine(
+                canvas,
+                centerX - endOffset - 160, endY + 200,
+                centerX - endOffset + 50, startY,
+                centerX - startOffset + curvedOffset  , startY - 100,
+                bluePaint
+        );
     }
 
 
@@ -107,9 +125,17 @@ public class GuideLinesView extends View {
         invalidate(); // Redraw the view with new detections
     }
 
+    public void drawCurvedLine(Canvas canvas, float startX, float startY, float controlX, float controlY, float endX, float endY, Paint paint) {
+        // Create a new Path
+        Path leftPath = new Path();
+        leftPath.moveTo(startX, startY);
+        leftPath.quadTo(controlX, controlY, endX, endY);
+        canvas.drawPath(leftPath, paint);
+    }
 
-
-
-
-
+    public void steeringAngle(int i2cReading)
+    {
+        curvedOffset = ((800*i2cReading)/32767) - 400;
+        invalidate();
+    }
 }
