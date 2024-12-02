@@ -14,10 +14,13 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 //import com.example.myapplication.ml.LiteModelSsdMobilenetV11Metadata2
 import com.example.myapplication.viewmodel.RearCameraViewModel
+import com.example.myapplication.viewmodel.RearCameraViewModelFactory
+import kotlinx.coroutines.launch
 
 //import org.tensorflow.lite.support.image.ImageProcessor
 //import org.tensorflow.lite.support.image.TensorImage
@@ -46,12 +49,24 @@ class MainActivity : AppCompatActivity() {
 //            .add(ResizeOp(300, 300, ResizeOp.ResizeMethod.BILINEAR))
 //            .build()
 
-        rearCameraViewModel = RearCameraViewModel(this,guideLinesView)
 
-        checkCameraPermission()
-        setupTextureView()
-        // this line is to check permission for VHAL add by hamed
-        requestPermissions(permission, steeringPermissionCode)
+        var factory=RearCameraViewModelFactory(applicationContext)
+        rearCameraViewModel = ViewModelProvider(this, factory).get(RearCameraViewModel::class.java)
+
+        lifecycleScope.launch {
+            rearCameraViewModel.startReadingSteering()
+        }
+        lifecycleScope.launchWhenStarted {
+            rearCameraViewModel.steeringAngle.collect { angle ->
+                if (angle != null) {
+                    guideLinesView.steeringAngle(angle)
+                }
+                Log.d("Steering", "New steering angle: $angle")
+            }
+        }
+      checkCameraPermission()
+      setupTextureView()
+      //  requestPermissions(permission, steeringPermissionCode)
 
     }
 

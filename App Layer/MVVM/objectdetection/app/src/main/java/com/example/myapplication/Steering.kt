@@ -2,12 +2,15 @@ package com.example.myapplication
 
 import android.car.Car
 import android.car.VehiclePropertyIds
+import android.car.hardware.CarPropertyValue
 import android.car.hardware.property.CarPropertyManager
 import android.content.Context
 import android.util.Log
 
 
 class Steering(var context: Context) {
+    val STEERING_PROPERTY: Int = 557842770
+    val areaId = 0
     var car: Car? = null
     lateinit var carPropertyManager: CarPropertyManager
 
@@ -22,39 +25,27 @@ class Steering(var context: Context) {
     }
 
     fun readStearing():Int {
-        var rpmValue =0
-     //   thread {
-            while (stearingRotate) {
-                try {
-                    synchronized(carPropertyManager) {
-                        val steeringAngle = carPropertyManager.getProperty(
-                            Integer::class.java,
-                            VehiclePropertyIds.STEERING_PROPERTY,
-                            0
-                        )
+         var  rpmValue:Int=0
+        try {
+            synchronized(carPropertyManager) {
+                // Get the steering angle property
 
-                        if (steeringAngle != null) {
-                            Log.d("Steering", "Raw steering angle: ${steeringAngle.value}")
+                val steeringAngle: CarPropertyValue<Integer> = carPropertyManager.getProperty(
+                    Integer::class.java, STEERING_PROPERTY, areaId
+                )
 
-                            if (steeringAngle.value is Integer) {
-                                val rpm = steeringAngle.value as Integer
-                                 rpmValue = rpm.toInt()
-                                Log.i("KZ", "RPM value polled: $rpmValue")
+                Log.d("Steering", "Raw steering angle: ${steeringAngle.value}")
 
-                            } else {
-                                Log.e("Steering", "Unexpected value type for steering angle: ${steeringAngle.value::class.java}")
-                            }
-                        } else {
-                            Log.w("Steering", "Received null value for STEERING_PROPERTY")
-                        }
-                    }
 
-                    Thread.sleep(50)
-                } catch (e: Exception) {
-                    Log.e("Steering", "Error reading steering angle", e)
-                }
+                val rpm = steeringAngle.value
+                 rpmValue = rpm.toInt()
+                Log.i("KZZ", "RPM value polled: $rpmValue")
+
             }
-       // }
+
+        } catch (e: Exception) {
+            Log.e("Steering", "Error reading steering angle", e)
+        }
         return rpmValue
     }
     companion object {
