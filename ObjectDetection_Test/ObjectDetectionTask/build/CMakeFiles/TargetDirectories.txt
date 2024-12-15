@@ -1,3 +1,0 @@
-/home/mostafa/Desktop/ITI/GP_Tasks/ObjectDetectionTask/build/CMakeFiles/rebuild_cache.dir
-/home/mostafa/Desktop/ITI/GP_Tasks/ObjectDetectionTask/build/CMakeFiles/edit_cache.dir
-/home/mostafa/Desktop/ITI/GP_Tasks/ObjectDetectionTask/build/CMakeFiles/ObjectDetection.dir
